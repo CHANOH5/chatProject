@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 
 @NoArgsConstructor
@@ -31,11 +32,11 @@ public class UserDTO implements Serializable {
 
     private Integer status;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     public UserDTO(String id, String password, String name,
                    String nickname, String email, Integer isAnonymous,
-                   Integer role, String profileImage, Integer status, Instant createdAt) {
+                   Integer role, String profileImage, Integer status, LocalDateTime createdAt) {
         this.id = id;
         this.password = password;
         this.name = name;

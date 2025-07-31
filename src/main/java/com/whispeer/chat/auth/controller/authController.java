@@ -8,10 +8,12 @@ import com.whispeer.chat.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class authController {
 
     private final UserRepository userRepository;
@@ -61,14 +63,22 @@ public class authController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO LoginRequestDTO) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(LoginRequestDTO.getUserId(), LoginRequestDTO.getPassword());
+                new UsernamePasswordAuthenticationToken(LoginRequestDTO.getId(), LoginRequestDTO.getPassword());
 
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        try {
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            String token = jwtUtil.generateToken(LoginRequestDTO.getId());
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+        }
 
-        // 인증 성공 시 토큰 생성
-        String token = jwtUtil.generateToken(LoginRequestDTO.getUserId());
-
-        return ResponseEntity.ok(Map.of("token", token)); // JSON 형태로 반환
+//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//
+//        // 인증 성공 시 토큰 생성
+//        String token = jwtUtil.generateToken(LoginRequestDTO.getUserId());
+//
+//        return ResponseEntity.ok(Map.of("token", token)); // JSON 형태로 반환
     } // login
 
 } // end class

@@ -1,18 +1,18 @@
 package com.whispeer.chat.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "tb_user")
 public class UserEntity {
@@ -21,7 +21,7 @@ public class UserEntity {
     @Column(name = "id", nullable = false, length = 20)
     private String id;
 
-    @Column(name = "password", nullable = false, length = 20)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "name", nullable = false, length = 20)
@@ -47,12 +47,12 @@ public class UserEntity {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Builder
     public UserEntity(String id, String password, String name, String nickname,
                       String email, Integer isAnonymous, Integer role,
-                      String profileImage, Integer status, Instant createdAt) {
+                      String profileImage, Integer status) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -62,7 +62,19 @@ public class UserEntity {
         this.role = role;
         this.profileImage = profileImage;
         this.status = status;
-        this.createdAt = createdAt;
+    }
+
+    // user Status 변경
+    public void deactivate() {
+        this.status = 0; // 또는 상수로 관리해도 좋음 (ex. STATUS_DISABLED)
+    }
+
+    // user 정보 수정
+    public void updateInfo(String name, String nickname, String email, String profileImage) {
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.profileImage = profileImage;
     }
 
 } // end class

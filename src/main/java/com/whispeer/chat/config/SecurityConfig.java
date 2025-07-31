@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,10 +30,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     } // passwordEncoder
 
-    @Bean
-    public static BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public static BCryptPasswordEncoder bCryptPasswordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     // /css/**, /js/**, /images/** 등 정적 자원에 대해 보안 필터 무시
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -65,16 +66,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth  -> auth
-                                .requestMatchers("/login", "/join", "/")
+                                .requestMatchers(
+                                        "/api/v1/login",
+                                        "/",
+                                        "/api/v1/**"
+                                )
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
 
     } // securityFilterChain
 

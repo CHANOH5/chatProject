@@ -9,18 +9,18 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginRequestDTO {
 
-    private String userId;
+    private String id;
     private String password;
 
-    public LoginRequestDTO(String userId, String password) {
-        this.userId = userId;
+    public LoginRequestDTO(String id, String password) {
+        this.id = id;
         this.password = password;
     } // constructor
 
     @Override
     public String toString() {
         return "LoginRequestDTO{" +
-                "userId='" + userId + '\'' +
+                "id='" + id + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     } // toString
